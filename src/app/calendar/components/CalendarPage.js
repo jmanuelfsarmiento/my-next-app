@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"; // Importar la HOC de drag and drop
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Typography } from "@mui/material";
+import { colors, Typography } from "@mui/material";
 import { useEvents } from "../hooks/useEvents";
 import { CalendarWrapper } from "./styled";
 import CalendarModal from "./CalendarModal";
@@ -23,6 +25,8 @@ const messages = {
   agenda: "Agenda",
   showMore: (total) => `+${total} más`,
 };
+
+const DnDCalendar = withDragAndDrop(Calendar);
 
 const Calendario = () => {
   const {
@@ -48,6 +52,7 @@ const Calendario = () => {
     handleSaveEvent,
     handleUpdateEvent,
     handleDeleteEvent,
+    handleEventDrop,
   } = useEvents();
 
   if (loading) {
@@ -57,10 +62,10 @@ const Calendario = () => {
       </CalendarWrapper>
     );
   }
-
+  
   return (
     <CalendarWrapper>
-      <Calendar
+      <DnDCalendar
         messages={messages}
         culture="es"
         localizer={localizer}
@@ -82,6 +87,8 @@ const Calendario = () => {
             backgroundColor: event.color,
           },
         })}
+        onEventDrop={handleEventDrop}
+        resizable={false}
       />
 
       <CalendarModal

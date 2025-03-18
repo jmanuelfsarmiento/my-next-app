@@ -13,8 +13,6 @@ export const useEvents = () => {
   const [eventColor, setEventColor] = useState("#2196F3");
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  
-
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -50,7 +48,7 @@ export const useEvents = () => {
   const handleSelectEvent = useCallback((event) => {
     setSelectedEvent(event);
     setEventTitle(event.title);
-    setEvenDescription(event.description)
+    setEvenDescription(event.description);
     setEventColor(event.color);
     setIsEditModalOpen(true);
   }, []);
@@ -112,6 +110,27 @@ export const useEvents = () => {
         .catch((error) => console.error("Error deleting event:", error));
     }
   };
+  
+  const handleEventDrop = useCallback(({ event, start }) => {
+    const updatedEvent = {
+      ...event,
+      eventAt: start.toISOString(), 
+    };
+
+    fetch(`https://6499e50479fbe9bcf8402476.mockapi.io/eventos/${event.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then(() => {
+        setEvents((prevEvents) => {
+          return prevEvents.map((item) =>
+            item.id === event.id ? { ...item, eventAt: start } : item
+          );
+        });
+      })
+      .catch((error) => console.error("Error updating event:", error));
+  }, []);
 
   return {
     events,
@@ -136,5 +155,6 @@ export const useEvents = () => {
     handleSaveEvent,
     handleUpdateEvent,
     handleDeleteEvent,
+    handleEventDrop,
   };
 };
